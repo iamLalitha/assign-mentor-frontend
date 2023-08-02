@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mentor and Student Assignment</title>
+</head>
+<body>
+  <h1>Mentor and Student Assignment</h1>
+
+  <!-- Mentor Form -->
+  <h2>Create Mentor</h2>
+  <form id="mentorForm">
+    <label for="mentorName">Mentor Name:</label>
+    <input type="text" id="mentorName" required>
+    <button type="submit">Create Mentor</button>
+  </form>
+
+  <!-- Student Form -->
+  <h2>Create Student</h2>
+  <form id="studentForm">
+    <label for="studentName">Student Name:</label>
+    <input type="text" id="studentName" required>
+    <button type="submit">Create Student</button>
+  </form>
+
+  <!-- Assign Student to Mentor Form -->
+  <h2>Assign Student to Mentor</h2>
+  <form id="assignForm">
+    <label for="mentorSelect">Select Mentor:</label>
+    <select id="mentorSelect" required>
+      <!-- Options will be populated using JavaScript -->
+    </select>
+    <label for="studentSelect">Select Student:</label>
+    <select id="studentSelect" required>
+      <!-- Options will be populated using JavaScript -->
+    </select>
+    <button type="button" onclick="assignStudentToMentor()">Assign Student</button>
+
+    <!-- Display Assigned Students for a Mentor -->
+  <h2>Assigned Students for Mentor</h2>
+  <div id="assignedStudents"></div>
+
+  <!-- Display Previous Mentor for a Student -->
+  <h2>Previous Mentor for Student</h2>
+  <div id="previousMentor"></div>
+  </form>
+
+  <script>
+    const API_BASE_URL = 'http://localhost:3001';
+
+    
+    // Function to fetch mentors from the backend API and populate the mentor dropdown
+    function fetchMentors() {
+      fetch(`${API_BASE_URL}/mentors`)
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error('Failed to fetch mentors');
+          }
+          return res.json();
+        })
+        .then((data) => {
+          const mentorSelect = document.getElementById('mentorSelect');
+          mentorSelect.innerHTML = '<option value="">Select Mentor</option>';
+          data.forEach((mentor) => {
+            const option = document.createElement('option');
+            option.value = mentor._id;
+            option.textContent = mentor.name;
+            mentorSelect.appendChild(option);
+          });
+        })
+        .catch((error) => console.error('Error fetching mentors:', error));
+    }
+
+    // Function to fetch students from the backend API and populate the student dropdown
+    function fetchStudents() {
+      fetch(`${API_BASE_URL}/students`)
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error('Failed to fetch students');
+          }
+          return res.json();
+        })
+        .then((data) => {
+          const studentSelect = document.getElementById('studentSelect');
+          studentSelect.innerHTML = '<option value="">Select Student</option>';
+          data.forEach((student) => {
+            const option = document.createElement('option');
+            option.value = student._id;
+            option.textContent = student.name;
+            studentSelect.appendChild(option);
+          });
+        })
+        .catch((error) => console.error('Error fetching students:', error));
+    }
+
+    // Function to create a new mentor using the backend API
+    function createMentor(mentorName) {
+      fetch(`${API_BASE_URL}/mentors`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: mentorName }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          alert('Mentor created successfully');
+          fetchMentors(); // Refresh mentor dropdown after creation
+        })
+        .catch((error) => alert('Error creating mentor: ' + error.message));
+    }
+
+    // Function to create a new student using the backend API
+    function createStudent(studentName) {
+      fetch(`${API_BASE_URL}/students`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: studentName }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          alert('Student created successfully');
+          fetchStudents(); // Refresh student dropdown after creation
+        })
+        .catch((error) => alert('Error creating student: ' + error.message));
+    }
+
+    // Function to assign a student to a mentor using the backend API
+    function assignStudentToMentor() {
+      const mentorId = document.getElementById('mentorSelect').value;
+      const studentId = document.getElementById('studentSelect').value;
+
+      fetch(`${API_BASE_URL}/mentors/${mentorId}/students`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ studentId }),
+      })
+        .then((res) => {
+          if (res.ok) {
+            alert('Student assigned to mentor successfully');
+            fetchStudents(); // Refresh student dropdown after assignment
+          } else {
+            return res.json().then((data) => {
+              throw new Error(data.message);
+            });
+          }
+        })
+        .catch((error) => alert('Error assigning student to mentor: ' + error.message));
+    }
+
+     // Function to show all students for a particular mentor
+     function showStudentsForMentor(mentorId) {
+      fetch(`${API_BASE_URL}/mentors/${mentorId}/students`)
+        .then((res) => res.json())
+        .then((data) => {
+          const assignedStudentsDiv = document.getElementById('assignedStudents');
+          assignedStudentsDiv.innerHTML = `Students for Mentor: ${data.map((student) => student.name).join(', ')}`;
+        })
+        .catch((error) => console.error('Error fetching students for mentor:', error));
+    }
+
+       // Function to show the previously assigned mentor for a particular student
+       function showPreviousMentorForStudent(studentId) {
+      fetch(`${API_BASE_URL}/students/${studentId}/previousMentor`)
+        .then((res) => res.json())
+        .then((data) => {
+          const previousMentorDiv = document.getElementById('previousMentor');
+          if (data.message) {
+            previousMentorDiv.textContent = data.message;
+          } else {
+            previousMentorDiv.textContent = `Previous Mentor for Student: ${data.name}`;
+          }
+        })
+        .catch((error) => console.error('Error fetching previous mentor for student:', error));
+    }
+
+    // Event listeners for form submissions
+    document.getElementById('mentorForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const mentorName = document.getElementById('mentorName').value;
+      createMentor(mentorName);
+    });
+
+    document.getElementById('studentForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const studentName = document.getElementById('studentName').value;
+      createStudent(studentName);
+    });
+
+    document.getElementById('assignForm').addEventListener('submit', assignStudentToMentor);
+
+    // Fetch mentors and students on page load
+    fetchMentors();
+    fetchStudents();
+  </script>
+</body>
+</html>
+
+
