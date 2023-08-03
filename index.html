@@ -4,8 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mentor and Student Assignment</title>
+  <link rel="stylesheet" href="./styles.css" type="text/css">
 </head>
 <body>
+  
   <h1>Mentor and Student Assignment</h1>
 
   <!-- Mentor Form -->
@@ -31,10 +33,12 @@
     <select id="mentorSelect" required>
       <!-- Options will be populated using JavaScript -->
     </select>
+    <br>
     <label for="studentSelect">Select Student:</label>
     <select id="studentSelect" required>
       <!-- Options will be populated using JavaScript -->
     </select>
+    <br>
     <button type="button" onclick="assignStudentToMentor()">Assign Student</button>
 
     <!-- Display Assigned Students for a Mentor -->
@@ -197,6 +201,8 @@
     // Fetch mentors and students on page load
     fetchMentors();
     fetchStudents();
+
+    
   </script>
 </body>
 </html>

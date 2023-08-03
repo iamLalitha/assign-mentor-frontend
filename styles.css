@@ -1,0 +1,53 @@
+body {
+  background-color: black;
+  color: white; /* Set text color to white */
+}
+
+/* Center the content vertically */
+.container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column; /* Arrange elements in a single column */
+}
+
+/* Custom styling for h1 and form elements */
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+}
+
+form {
+  max-width: 400px;
+  width: 100%;
+}
+
+label, input, select, button {
+  margin-bottom: 1rem;
+  color: white; /* Set text color to white */
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Style for lists */
+ul {
+  color: white;
+  list-style: none; /* Remove bullets from list items */
+  padding: 0; /* Remove default padding from the ul element */
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
